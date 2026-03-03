@@ -403,6 +403,11 @@ const waitForEmail = async () => {
                 "Discussion added to case, marked 'Complete and Double Check'"
             ],
             artifacts: [{
+                id: "art-cobra-review", type: "video",
+                label: "Browser Agent - COBRA Admin Portal",
+                videoPath: "/data/wcc_004_step11_cobra.webm"
+            },
+            {
                 id: "art-summary", type: "json", label: "Completion Summary",
                 data: {
                     caseId: "WCC_004",
