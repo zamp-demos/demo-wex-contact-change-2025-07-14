@@ -111,7 +111,13 @@ const waitForEmail = async () => {
                 "Divisional contact: cannot have Primary role - verified",
                 "Added to Benefits Admin Portal with portal access",
                 "Reports and notifications configured for applicable divisions"
-            ]
+            ],
+            artifacts: [{
+                id: "art-onbase-divisional",
+                type: "video",
+                label: "Browser Agent - OnBase Divisional Contact Creation",
+                videoPath: "/data/wcc_004_step2_onbase_divisional.webm"
+            }]
         },
         {
             id: "step-3",
