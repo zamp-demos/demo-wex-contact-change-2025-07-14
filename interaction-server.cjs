@@ -27,7 +27,7 @@ if (!fs.existsSync(PROCESSES_FILE) && fs.existsSync(BASE_PROCESSES)) {
     fs.copyFileSync(BASE_PROCESSES, PROCESSES_FILE);
 }
 if (!fs.existsSync(SIGNAL_FILE)) {
-    fs.writeFileSync(SIGNAL_FILE, JSON.stringify({ APPROVE_HIPAA_EMAIL: false }, null, 4));
+    fs.writeFileSync(SIGNAL_FILE, JSON.stringify({ APPROVE_HIPAA_EMAIL: false, WCC005_ANALYST_RFI: false, WCC005_ANALYST_ESCALATE: false, WCC005_MGR_ADD: false, WCC005_MGR_EDIT: false, WCC005_MGR_RFI: false }, null, 4));
 }
 if (!fs.existsSync(FEEDBACK_QUEUE_PATH)) fs.writeFileSync(FEEDBACK_QUEUE_PATH, '[]');
 if (!fs.existsSync(KB_VERSIONS_PATH)) fs.writeFileSync(KB_VERSIONS_PATH, '[]');
@@ -77,7 +77,7 @@ const server = http.createServer(async (req, res) => {
         state = { sent: false, confirmed: false, signals: {} };
         console.log('Demo Reset Triggered');
 
-        fs.writeFileSync(SIGNAL_FILE, JSON.stringify({ APPROVE_HIPAA_EMAIL: false }, null, 4));
+        fs.writeFileSync(SIGNAL_FILE, JSON.stringify({ APPROVE_HIPAA_EMAIL: false, WCC005_ANALYST_RFI: false, WCC005_ANALYST_ESCALATE: false, WCC005_MGR_ADD: false, WCC005_MGR_EDIT: false, WCC005_MGR_RFI: false }, null, 4));
 
         runningProcesses.forEach((proc, id) => {
             try { process.kill(-proc.pid, 'SIGKILL'); } catch (e) { }
@@ -114,6 +114,13 @@ const server = http.createServer(async (req, res) => {
                         year: new Date().toISOString().split('T')[0], status: "In Progress",
                         currentStatus: "Initializing...", contactType: "Client",
                         actionType: "Add", requestSource: "LEAP Contact Change Queue"
+                    },
+                    {
+                        id: "WCC_005", name: "Jane Smith - Identity Conflict on Add",
+                        category: "Contact Change Processing", stockId: "GPID-33456",
+                        year: new Date().toISOString().split('T')[0], status: "In Progress",
+                        currentStatus: "Initializing...", contactType: "Client",
+                        actionType: "Add", requestSource: "Client Contact Change Form"
                     }
                 ];
                 fs.writeFileSync(PROCESSES_FILE, JSON.stringify(cases, null, 4));
@@ -130,7 +137,8 @@ const server = http.createServer(async (req, res) => {
                     { file: 'wcc_story_1_happy_path.cjs', id: 'WCC_001' },
                     { file: 'wcc_story_2_happy_path.cjs', id: 'WCC_002' },
                     { file: 'wcc_story_3_needs_attention.cjs', id: 'WCC_003' },
-                    { file: 'wcc_story_4_needs_attention.cjs', id: 'WCC_004' }
+                    { file: 'wcc_story_4_needs_attention.cjs', id: 'WCC_004' },
+                    { file: 'wcc_story_5_needs_attention.cjs', id: 'WCC_005' }
                 ];
 
                 let totalDelay = 0;
@@ -173,7 +181,7 @@ const server = http.createServer(async (req, res) => {
     // ---- SIGNAL ----
     if (cleanPath === '/signal' && req.method === 'POST') {
         const body = JSON.parse(await readBody(req));
-        const { signalId } = body;
+        const signalId = body.signalId || body.signal;
         try {
             let signals = {};
             if (fs.existsSync(SIGNAL_FILE)) signals = JSON.parse(fs.readFileSync(SIGNAL_FILE, 'utf8'));
