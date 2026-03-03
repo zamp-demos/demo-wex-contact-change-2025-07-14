@@ -93,7 +93,13 @@ const waitForEmail = async () => {
                 "Divisions requested: Northeast, Southeast, Central",
                 "Divisional contacts cannot have Primary role",
                 "Per SOP: encourage umbrella access first"
-            ]
+            ],
+            artifacts: [{
+                id: "art-onbase-review",
+                type: "video",
+                label: "Browser Agent - OnBase Unity Review",
+                videoPath: "/data/wcc_004_step1_onbase.webm"
+            }]
         },
         {
             id: "step-2",
@@ -119,12 +125,6 @@ const waitForEmail = async () => {
                 "Email pending human review before sending"
             ],
             artifacts: [
-        {
-          id: "art-onbase-review",
-          type: "video",
-          label: "Browser Agent - OnBase Unity Review",
-          videoPath: "/data/wcc_004_step1_onbase.webm"
-        },
         {
                 id: "art-email", type: "email_draft", label: "Umbrella Access Recommendation",
                 data: {
