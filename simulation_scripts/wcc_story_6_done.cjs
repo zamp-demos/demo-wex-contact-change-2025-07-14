@@ -283,29 +283,76 @@ const updateProcessListStatus = async (processId, status, currentStatus) => {
     await updateProcessListStatus(PROCESS_ID, "In Progress", "Decision recorded - proceeding with new COBRA contact creation");
     await delay(1500);
 
-    // === Steps 7-11: Post-decision flow ===
+    // === Step 7: HITL - Confirm future case handling ===
+    updateProcessLog(PROCESS_ID, {
+        id: "step-7",
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        title: "Reviewing decision for future case applicability...",
+        status: "processing"
+    });
+    await updateProcessListStatus(PROCESS_ID, "In Progress", "Reviewing decision for future case applicability...");
+    await delay(2000);
+
+    updateProcessLog(PROCESS_ID, {
+        id: "step-7",
+        title: "New precedent detected - confirm future case handling",
+        status: "warning",
+        reasoning: [
+            "This is the first case involving a previously deactivated contact in COBRA",
+            "The SOP does not cover this scenario explicitly",
+            "Analyst chose: Create new record alongside deactivated one",
+            "Rationale: avoids carrying forward stale data, outdated SSO, or incorrect roles",
+            "This decision could be applied as standard handling for all similar future cases",
+            "Awaiting confirmation to update Knowledge Base"
+        ],
+        artifacts: [{
+            id: "art-future-decision", type: "decision", label: "Future Case Handling",
+            data: {
+                question: "Should this approach (create new record alongside deactivated contacts) be applied as standard handling for all future cases?",
+                options: [
+                    { label: "Yes - apply this as the standard approach for future deactivated contact cases", value: "yes", signal: "WCC006_KB_YES" },
+                    { label: "No - treat this as a one-time decision only", value: "no", signal: "WCC006_KB_NO" }
+                ]
+            }
+        }]
+    });
+    await updateProcessListStatus(PROCESS_ID, "Needs Attention", "New precedent detected - confirm future case handling");
+
+    console.log(`${PROCESS_ID}: Waiting for Knowledge Base confirmation...`);
+    await waitForSignal(["WCC006_KB_YES", "WCC006_KB_NO"]);
+    console.log(`${PROCESS_ID}: KB confirmation received.`);
+
+    updateProcessLog(PROCESS_ID, {
+        id: "step-7",
+        title: "Knowledge Base updated - future deactivated contact cases will follow this precedent",
+        status: "success",
+        reasoning: [
+            "Analyst confirmed: apply this decision to all future cases",
+            "Knowledge Base updated with new rule:",
+            "  When a deactivated contact (z-prefix) is found in COBRA:",
+            "  → Always create a new record alongside the deactivated one",
+            "  → Do not reactivate old records (risk of stale data)",
+            "  → Preserve deactivated record as historical reference",
+            "This precedent will be automatically applied in future cases",
+            "No further analyst intervention needed for this scenario type"
+        ],
+        artifacts: [{
+            id: "art-kb-update", type: "json", label: "Knowledge Base Entry",
+            data: {
+                type: "Process Learning",
+                rule: "When a deactivated contact is found in COBRA, always create a new record alongside it",
+                rationale: "Reactivating old records risks carrying forward stale data, outdated SSO configurations, and incorrect role assignments",
+                applicability: "All future deactivated contact rediscovery cases",
+                capturedFrom: "WCC_006",
+                status: "Active"
+            }
+        }]
+    });
+    await updateProcessListStatus(PROCESS_ID, "In Progress", "Knowledge Base updated - proceeding with COBRA contact creation");
+    await delay(1500);
+
+    // === Steps 8-12: Post-decision flow ===
     const postDecisionSteps = [
-        {
-            id: "step-7",
-            title_p: "Recording decision precedent for future reference...",
-            title_s: "Precedent captured: always create new records alongside previously deactivated contacts",
-            reasoning: [
-                "Decision: Create new record alongside deactivated contact",
-                "Rationale: Avoids carrying forward stale data, outdated SSO configurations, or incorrect role assignments from prior setup",
-                "This precedent will apply to all future cases involving previously deactivated contacts",
-                "Deactivated record (zReynolds, Mark) will remain in system as historical reference"
-            ],
-            artifacts: [{
-                id: "art-precedent", type: "json", label: "Decision Precedent",
-                data: {
-                    type: "Process Learning",
-                    decision: "Create new record alongside deactivated contact",
-                    rationale: "Reactivating old records risks carrying forward stale data, outdated SSO configurations, and incorrect role assignments from prior setups",
-                    applicability: "All future deactivated contact rediscovery cases",
-                    capturedFrom: "WCC_006"
-                }
-            }]
-        },
         {
             id: "step-8",
             title_p: "Creating new contact in COBRA Admin Portal...",
@@ -388,7 +435,7 @@ const updateProcessListStatus = async (processId, status, currentStatus) => {
                 "COBRA Admin Portal: New contact created alongside preserved deactivated record",
                 "SSO: Configured via LEAP → COBRA linkage (24hr activation)",
                 "Relius: Not applicable (no Plan Document role)",
-                "Decision precedent captured: always create new records for previously deactivated contacts",
+                "Knowledge Base updated: future deactivated contact cases will follow this precedent",
                 "Discussion added to case outlining all changes and decision rationale",
                 "Case marked 'Complete and Double Check'"
             ],
