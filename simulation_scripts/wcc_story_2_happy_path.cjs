@@ -201,7 +201,12 @@ const updateProcessListStatus = async (processId, status, currentStatus) => {
                 "Ensured 'Allow SSO' is checked",
                 "Clicked 'Insert'",
                 "Repeated for GPID 78902 (email: bobjones-78902) and GPID 78903 (email: bobjones-78903)"
-            ]
+            ],
+            artifacts: [{
+                id: "art-cobra-review", type: "video",
+                label: "Browser Agent - COBRA Admin Portal",
+                videoPath: "/data/wcc_002_step6_cobra.webm"
+            }]
         },
         {
             id: "step-7",
