@@ -42,6 +42,12 @@ const updateProcessLog = (processId, logEntry, keyDetailsUpdate = {}) => {
     if (keyDetailsUpdate && Object.keys(keyDetailsUpdate).length > 0) {
         data.keyDetails = { ...data.keyDetails, ...keyDetailsUpdate };
     }
+    // Sort logs by step ID to ensure correct order after any race conditions
+    data.logs.sort((a, b) => {
+        const numA = parseInt((a.id || '').replace('step-', ''), 10) || 0;
+        const numB = parseInt((b.id || '').replace('step-', ''), 10) || 0;
+        return numA - numB;
+    });
     writeJson(processFile, data);
 };
 
