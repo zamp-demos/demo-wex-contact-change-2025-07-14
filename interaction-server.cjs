@@ -180,6 +180,19 @@ const server = http.createServer(async (req, res) => {
         } else if (req.method === 'POST') {
             const body = JSON.parse(await readBody(req));
             state.sent = body.sent;
+            // When email is sent, also fire the APPROVE_HIPAA_EMAIL signal
+            // so WCC_003 simulation continues to next steps
+            if (body.sent) {
+                try {
+                    let signals = {};
+                    if (fs.existsSync(SIGNAL_FILE)) signals = JSON.parse(fs.readFileSync(SIGNAL_FILE, 'utf8'));
+                    signals['APPROVE_HIPAA_EMAIL'] = true;
+                    const tmp = SIGNAL_FILE + '.' + Math.random().toString(36).substring(7) + '.tmp';
+                    fs.writeFileSync(tmp, JSON.stringify(signals, null, 4));
+                    fs.renameSync(tmp, SIGNAL_FILE);
+                    console.log('APPROVE_HIPAA_EMAIL signal fired via email-status');
+                } catch (e) { console.error('Signal write error from email-status:', e); }
+            }
             res.writeHead(200, { ...corsHeaders, 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ status: 'ok' }));
         }
