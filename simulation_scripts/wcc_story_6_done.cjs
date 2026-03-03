@@ -166,7 +166,7 @@ const updateProcessListStatus = async (processId, status, currentStatus) => {
             title_p: "Activating portal access in Benefits Admin...",
             title_s: "Portal access granted - username: mark.reynolds@acmefinancial.com",
             reasoning: [
-                "Clicked 'Manage employer portal users' → 'Add New User'",
+                "Clicked 'Manage employer portal users', then 'Add New User'",
                 "Single client account - using email as Username",
                 "Left 'Email Password' as No",
                 "Selected all roles except Benefits Administrator",
@@ -330,9 +330,9 @@ const updateProcessListStatus = async (processId, status, currentStatus) => {
             "Analyst confirmed: apply this decision to all future cases",
             "Knowledge Base updated with new rule:",
             "  When a deactivated contact (z-prefix) is found in COBRA:",
-            "  → Always create a new record alongside the deactivated one",
-            "  → Do not reactivate old records (risk of stale data)",
-            "  → Preserve deactivated record as historical reference",
+            "  - Always create a new record alongside the deactivated one",
+            "  - Do not reactivate old records (risk of stale data)",
+            "  - Preserve deactivated record as historical reference",
             "This precedent will be automatically applied in future cases",
             "No further analyst intervention needed for this scenario type"
         ],
@@ -397,7 +397,7 @@ const updateProcessListStatus = async (processId, status, currentStatus) => {
                 "Found Mark Reynolds in Employer Contacts",
                 "Clicked contact's first name (kept window open)",
                 "Opened new window to COBRA admin portal",
-                "Located client → Contacts tab → new active record",
+                "Located client, navigated to Contacts tab, found new active record",
                 "Copied email from new COBRA contact's Email field",
                 "Returned to LEAP window",
                 "Pasted into COBRA User Name field (Employer contact)",
@@ -406,7 +406,7 @@ const updateProcessListStatus = async (processId, status, currentStatus) => {
             artifacts: [{
                 id: "art-sso", type: "json", label: "SSO Configuration",
                 data: {
-                    system: "LEAP → COBRA SSO",
+                    system: "LEAP to COBRA SSO",
                     contactType: "Employer",
                     cobraUsername: "mark.reynolds@acmefinancial.com",
                     ssoStatus: "Active (24hr activation)",
@@ -433,7 +433,7 @@ const updateProcessListStatus = async (processId, status, currentStatus) => {
                 "OnBase Unity: Contact created with Primary and Portal Access roles",
                 "Benefits Admin Portal: Profile added, portal access granted",
                 "COBRA Admin Portal: New contact created alongside preserved deactivated record",
-                "SSO: Configured via LEAP → COBRA linkage (24hr activation)",
+                "SSO: Configured via LEAP-COBRA linkage (24hr activation)",
                 "Relius: Not applicable (no Plan Document role)",
                 "Knowledge Base updated: future deactivated contact cases will follow this precedent",
                 "Discussion added to case outlining all changes and decision rationale",
