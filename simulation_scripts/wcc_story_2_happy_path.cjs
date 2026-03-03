@@ -118,14 +118,15 @@ const updateProcessListStatus = async (processId, status, currentStatus) => {
             title_p: "Creating consultant contact in OnBase Unity...",
             title_s: "Consultant created in OnBase Unity with Aptia details",
             reasoning: [
-                "Contact does not exist in OnBase Unity - creating new",
+                "Searched for Bob Jones using 'Add existing' icon - no results found",
                 "Clicked 'Create Object' - entered name, email",
                 "Included Aptia EEID: APT-2847",
-                "This is an Aptia contact - EEID included in record",
+                "Checked form for GOSS role - not applicable (Program level)",
                 "Uploaded change form - Description: 'Case WCC_002, Add'",
-                "Linked consulting office: ConsultFirm Partners",
                 "Aptia role is Program level - linked Aptia consulting office",
-                "Multi-client: added to all 3 client accounts"
+                "Saved contact record for GPID 78901",
+                "Added existing contact to GPID 78902 via 'Add existing'",
+                "Added existing contact to GPID 78903 via 'Add existing'"
             ],
             artifacts: [{
                 id: "art-onbase-consultant",
@@ -160,14 +161,19 @@ const updateProcessListStatus = async (processId, status, currentStatus) => {
             title_p: "Adding consultant to Benefits Admin Portal (multi-client)...",
             title_s: "Portal access granted with name-GPID username format",
             reasoning: [
+                "Located client GPID 78901 in Benefits Admin Portal",
+                "Clicked 'Manage profile' under Employer Setup",
+                "Completed Main Contact Info fields (matching OnBase Unity exactly)",
+                "Clicked 'Add' then 'Submit'",
+                "Clicked 'Manage employer portal users' → 'Add New User'",
+                "Selected client from Employer dropdown → clicked 'Grant Access'",
                 "Consultant has multiple client accounts - using name-GPID format",
                 "Username set to: bobjones-78901",
-                "Clicked 'Grant Access' → entered name-GPID as Username",
+                "Left 'Email Password' as No",
                 "Selected all roles except Benefits Administrator",
-                "Clicked 'Add' - red alert displayed!",
-                "Red alert confirms linked/consultant account",
-                "Already using name-GPID format - alert is expected",
-                "No report/file email notifications (Aptia Program level rule)"
+                "Clicked 'Add' - no red alert (name-GPID format already applied)",
+                "No report/file email notifications (Aptia Program level rule)",
+                "Repeated for GPID 78902 (username: bobjones-78902) and GPID 78903 (username: bobjones-78903)"
             ],
             artifacts: [{
                 id: "art-ben-alert", type: "json", label: "Benefits Portal - Red Alert Handled",
@@ -186,13 +192,15 @@ const updateProcessListStatus = async (processId, status, currentStatus) => {
             title_p: "Adding consultant to COBRA Admin Portal...",
             title_s: "COBRA contact added with name-GPID email format",
             reasoning: [
-                "Located client in COBRA Admin Portal",
-                "Verified 'Allow Client SSO' is checked",
-                "Added new contact - Contact Type: Other Contact",
+                "Located client GPID 78901 in COBRA Admin Portal",
+                "Verified 'Allow Client SSO' is checked on General tab",
+                "Selected Contacts tab → 'Add a new Contact'",
+                "Entered contact info, Contact Type: Other Contact",
                 "Multi-client consultant: used name-GPID in Email field",
-                "Email field set to: bobjones-78901 (no duplicate emails allowed)",
+                "Email field set to: bobjones-78901",
                 "Ensured 'Allow SSO' is checked",
-                "Clicked 'Insert'"
+                "Clicked 'Insert'",
+                "Repeated for GPID 78902 (email: bobjones-78902) and GPID 78903 (email: bobjones-78903)"
             ]
         },
         {
