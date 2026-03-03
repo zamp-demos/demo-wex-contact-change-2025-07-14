@@ -244,17 +244,24 @@ const updateProcessListStatus = async (processId, status, currentStatus) => {
             "Risk if creating new: duplicate entries (one active, one inactive) in system",
             "Escalating to analyst for decision on how to proceed"
         ],
-        artifacts: [{
-            id: "art-cobra-decision", type: "decision", label: "COBRA Contact Resolution",
-            data: {
-                question: "A deactivated record for Mark Reynolds was found in COBRA (z-prefix, inactive, stale email). How should this be handled?",
-                options: [
-                    { label: "Reactivate old record (remove z-prefix, update contact info, verify SSO settings)", value: "reactivate", signal: "WCC006_REACTIVATE" },
-                    { label: "Create new record alongside deactivated one (standard add process)", value: "create_new", signal: "WCC006_CREATE_NEW" },
-                    { label: "Other approach (document in case notes)", value: "other", signal: "WCC006_OTHER" }
-                ]
+        artifacts: [
+            {
+                id: "art-cobra-review", type: "video",
+                label: "Browser Agent - COBRA Admin Portal Review",
+                videoPath: "/data/wcc_006_step6_cobra.webm"
+            },
+            {
+                id: "art-cobra-decision", type: "decision", label: "COBRA Contact Resolution",
+                data: {
+                    question: "A deactivated record for Mark Reynolds was found in COBRA (z-prefix, inactive, stale email). How should this be handled?",
+                    options: [
+                        { label: "Reactivate old record (remove z-prefix, update contact info, verify SSO settings)", value: "reactivate", signal: "WCC006_REACTIVATE" },
+                        { label: "Create new record alongside deactivated one (standard add process)", value: "create_new", signal: "WCC006_CREATE_NEW" },
+                        { label: "Other approach (document in case notes)", value: "other", signal: "WCC006_OTHER" }
+                    ]
+                }
             }
-        }]
+        ]
     });
     await updateProcessListStatus(PROCESS_ID, "Needs Attention", "Deactivated record found in COBRA - analyst decision required");
 
@@ -274,17 +281,24 @@ const updateProcessListStatus = async (processId, status, currentStatus) => {
             "Analyst decision received: Create new record alongside deactivated one",
             "Proceeding with standard add process for new contact"
         ],
-        artifacts: [{
-            id: "art-cobra-decision", type: "decision", label: "COBRA Contact Resolution",
-            data: {
-                question: "A deactivated record for Mark Reynolds was found in COBRA (z-prefix, inactive, stale email). How should this be handled?",
-                options: [
-                    { label: "Reactivate old record (remove z-prefix, update contact info, verify SSO settings)", value: "reactivate", signal: "WCC006_REACTIVATE" },
-                    { label: "Create new record alongside deactivated one (standard add process)", value: "create_new", signal: "WCC006_CREATE_NEW" },
-                    { label: "Other approach (document in case notes)", value: "other", signal: "WCC006_OTHER" }
-                ]
+        artifacts: [
+            {
+                id: "art-cobra-review", type: "video",
+                label: "Browser Agent - COBRA Admin Portal Review",
+                videoPath: "/data/wcc_006_step6_cobra.webm"
+            },
+            {
+                id: "art-cobra-decision", type: "decision", label: "COBRA Contact Resolution",
+                data: {
+                    question: "A deactivated record for Mark Reynolds was found in COBRA (z-prefix, inactive, stale email). How should this be handled?",
+                    options: [
+                        { label: "Reactivate old record (remove z-prefix, update contact info, verify SSO settings)", value: "reactivate", signal: "WCC006_REACTIVATE" },
+                        { label: "Create new record alongside deactivated one (standard add process)", value: "create_new", signal: "WCC006_CREATE_NEW" },
+                        { label: "Other approach (document in case notes)", value: "other", signal: "WCC006_OTHER" }
+                    ]
+                }
             }
-        }]
+        ]
     });
     await updateProcessListStatus(PROCESS_ID, "In Progress", "Decision recorded - proceeding with new COBRA contact creation");
     await delay(1500);
