@@ -199,6 +199,16 @@ const waitForEmail = async () => {
                         "Escalate to manager for decision"
                     ]
                 }
+            },
+            {
+                id: "art-decision-escalation", type: "decision", label: "Resolution Required",
+                data: {
+                    question: "Identity conflict detected: Jane Smith (jane.smith@acme.com) vs existing Jane Smith (jsmith@acme.com). How should this be resolved?",
+                    options: [
+                        { value: "escalate", label: "Escalate to Manager for decision", signal: "ESCALATE_TO_MANAGER" },
+                        { value: "rfi_direct", label: "Send RFI to client to clarify identity", signal: "ESCALATE_TO_MANAGER" }
+                    ]
+                }
             }]
         }
     ];
@@ -256,6 +266,17 @@ const waitForEmail = async () => {
                 riskLevel: "HIGH",
                 escalationStatus: "Escalated to Manager",
                 possibleResolutions: ["Add as new contact", "Edit existing contact", "Send RFI to client"]
+            }
+        },
+        {
+            id: "art-decision-manager", type: "decision", label: "Manager Decision Required",
+            data: {
+                question: "As manager, how should the identity conflict for Jane Smith be resolved?",
+                options: [
+                    { value: "rfi", label: "Send RFI to client to clarify identity", signal: "MANAGER_DECISION_RFI" },
+                    { value: "add_new", label: "Add as new contact (treat as different person)", signal: "MANAGER_DECISION_RFI" },
+                    { value: "edit_existing", label: "Edit existing contact (treat as same person)", signal: "MANAGER_DECISION_RFI" }
+                ]
             }
         }]
     });
