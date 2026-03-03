@@ -54,8 +54,8 @@
     {
         "id": "WCC_005",
         "category": "Contact Change Processing",
-        "name": "Jane Smith - Identity Conflict on Add",
-        "stockId": "GPID-33456",
+        "name": "Jane Smith - Conflicting Identity on Contact Add",
+        "stockId": "GPID-33210",
         "year": "2025-07-14",
         "status": "Ready",
         "currentStatus": "Ready for processing",

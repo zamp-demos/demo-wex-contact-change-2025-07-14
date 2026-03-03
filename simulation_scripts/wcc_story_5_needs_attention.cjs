@@ -5,7 +5,7 @@ const PROJECT_ROOT = path.join(__dirname, '..');
 const PUBLIC_DATA_DIR = path.join(PROJECT_ROOT, 'public/data');
 const PROCESSES_FILE = path.join(PUBLIC_DATA_DIR, 'processes.json');
 const PROCESS_ID = "WCC_005";
-const CASE_NAME = "Jane Smith - Identity Conflict on Add";
+const CASE_NAME = "Jane Smith - Conflicting Identity on Contact Add";
 
 const readJson = (file) => (fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, 'utf8')) : []);
 const writeJson = (file, data) => fs.writeFileSync(file, JSON.stringify(data, null, 4));
@@ -83,6 +83,27 @@ const waitForSignal = async (signalId) => {
     }
 };
 
+const waitForEmail = async () => {
+    console.log("Waiting for user to send email...");
+    const API_URL = process.env.VITE_API_URL || 'http://localhost:3001';
+    try {
+        await fetch(`${API_URL}/email-status`, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ sent: false })
+        });
+    } catch (e) { console.error("Failed to reset email status", e); }
+    while (true) {
+        try {
+            const response = await fetch(`${API_URL}/email-status`);
+            if (response.ok) {
+                const { sent } = await response.json();
+                if (sent) { console.log("Email Sent!"); return true; }
+            }
+        } catch (e) { }
+        await delay(2000);
+    }
+};
+
 (async () => {
     console.log(`Starting ${PROCESS_ID}: ${CASE_NAME}...`);
 
@@ -90,51 +111,86 @@ const waitForSignal = async (signalId) => {
         logs: [],
         keyDetails: {
             "Contact Name": "Jane Smith",
-            "GPID": "33456",
+            "GPID": "33210",
             "Contact Type": "Client",
-            "Action": "Add (Requested)",
+            "Action": "Add",
             "Request Source": "Client Contact Change Form",
-            "Email on Form": "jane.smith@acme.com",
-            "Risk": "Identity conflict detected"
+            "Requested Email": "jane.smith@acme.com",
+            "Conflict": "Existing jsmith@acme.com found",
+            "Risk": "Identity conflict - duplicate name"
         }
     });
 
-    // ==========================================
-    // PRE-CONFLICT STEPS (normal processing)
-    // ==========================================
+    // --- Pre-HITL Steps ---
     const preSteps = [
         {
             id: "step-1",
-            title_p: "Reviewing Client Contact Change Form...",
-            title_s: "Form validated - Add request for Jane Smith (jane.smith@acme.com)",
+            title_p: "Reviewing contact change form for Jane Smith...",
+            title_s: "Form validated - Add request for GPID 33210",
             reasoning: [
-                "Form received: Client Contact Change Form for GPID 33456",
+                "Contact Change Form received from Acme Corp HR",
                 "Contact: Jane Smith (jane.smith@acme.com)",
-                "Action requested: Add new contact",
-                "Roles requested: Primary, Portal Access, File Notifications",
-                "Client account: Acme Industries",
-                "All required fields populated - proceeding to OnBase Unity"
-            ],
-            artifacts: [{
-                id: "art-form", type: "file", label: "Client Contact Change Form",
-                pdfPath: "/data/wcc005_contact_change_form.pdf"
-            }]
+                "Client account: GPID 33210 (Acme Corp)",
+                "Action: Add as new client contact",
+                "Roles requested: Primary, Portal Access",
+                "Proceeding to locate client in OnBase Unity"
+            ]
         },
         {
             id: "step-2",
-            title_p: "Locating client account in OnBase Unity...",
-            title_s: "Client located - reviewing existing contacts on GPID 33456",
+            title_p: "Locating client in OnBase Unity...",
+            title_s: "Client located - checking Associated Companies",
             reasoning: [
-                "Searched OnBase Unity for GPID 33456",
-                "Account found: Acme Industries",
-                "Associated Companies: None (single GPID)",
-                "Navigating to Contacts tab to review existing contacts",
-                "Checking for potential duplicates before creating new record"
+                "Searched OnBase Unity for GPID 33210",
+                "Client found: Acme Corp",
+                "Navigated to Associated Companies tab",
+                "Result: No associated companies found",
+                "Single-client account confirmed",
+                "Proceeding to Contacts tab to check existing contacts"
             ]
+        },
+        {
+            id: "step-3",
+            title_p: "Checking Contacts tab for existing records...",
+            title_s: "IDENTITY CONFLICT DETECTED - existing Jane Smith with different email",
+            reasoning: [
+                "Navigated to Contacts tab in OnBase Unity",
+                "Found existing contact: Jane Smith (jsmith@acme.com)",
+                "New request is for: Jane Smith (jane.smith@acme.com)",
+                "CONFLICT: Same name, different email addresses",
+                "Cannot determine if this is the same person or a different Jane Smith",
+                "Possible scenarios:",
+                "  A) Same person - email address changed (update existing)",
+                "  B) Different person - coincidental name match (add new)",
+                "  C) Data entry error on one of the records",
+                "Business rule: Cannot proceed without identity resolution",
+                "Escalation required - human decision needed"
+            ],
+            artifacts: [{
+                id: "art-conflict", type: "json", label: "Identity Conflict Analysis",
+                data: {
+                    newRequest: {
+                        name: "Jane Smith",
+                        email: "jane.smith@acme.com",
+                        rolesRequested: ["Primary", "Portal Access"]
+                    },
+                    existingRecord: {
+                        name: "Jane Smith",
+                        email: "jsmith@acme.com",
+                        currentRoles: ["Portal Access", "File Notifications"]
+                    },
+                    conflictType: "Same name, different email",
+                    riskLevel: "HIGH",
+                    possibleResolutions: [
+                        "Send RFI to client to clarify identity",
+                        "Escalate to manager for decision"
+                    ]
+                }
+            }]
         }
     ];
 
-    // Run pre-conflict steps normally
+    // Run pre-HITL steps
     for (let i = 0; i < preSteps.length; i++) {
         const step = preSteps[i];
         updateProcessLog(PROCESS_ID, {
@@ -146,292 +202,170 @@ const waitForSignal = async (signalId) => {
         await updateProcessListStatus(PROCESS_ID, "In Progress", step.title_p);
         await delay(2000);
 
+        const isFinalPre = i === preSteps.length - 1;
         updateProcessLog(PROCESS_ID, {
             id: step.id,
             title: step.title_s,
-            status: "success",
+            status: isFinalPre ? "warning" : "success",
             reasoning: step.reasoning || [],
             artifacts: step.artifacts || []
         });
-        await updateProcessListStatus(PROCESS_ID, "In Progress", step.title_s);
+        await updateProcessListStatus(PROCESS_ID,
+            isFinalPre ? "Needs Attention" : "In Progress",
+            isFinalPre ? "Identity conflict detected - escalation required" : step.title_s
+        );
         await delay(1500);
     }
 
-    // ==========================================
-    // STEP 3: CONFLICT DETECTED + HITL #1
-    // Two options: Send RFI or Escalate to Manager
-    // ==========================================
-    updateProcessLog(PROCESS_ID, {
-        id: "step-3",
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        title: "Checking for existing contacts with matching identity...",
-        status: "processing"
-    });
-    await updateProcessListStatus(PROCESS_ID, "In Progress", "Checking for existing contacts with matching identity...");
-    await delay(2200);
+    // --- HITL 1: Escalate to Manager ---
+    console.log("HITL 1: Waiting for ESCALATE_TO_MANAGER signal...");
+    await waitForSignal("ESCALATE_TO_MANAGER");
+    console.log("HITL 1 resolved: Escalated to manager.");
 
     updateProcessLog(PROCESS_ID, {
         id: "step-3",
-        title: "IDENTITY CONFLICT - Jane Smith already exists with different email (jsmith@acme.com)",
-        status: "warning",
-        reasoning: [
-            "Existing contact found: Jane Smith (jsmith@acme.com) on GPID 33456",
-            "Request is to ADD: Jane Smith (jane.smith@acme.com) to same account",
-            "Same name, different email — cannot determine if this is:",
-            "  (a) The same person whose email changed (should be an Edit, not Add)",
-            "  (b) A different person who shares the same name (legitimate Add)",
-            "If treated as Add: risk of duplicate records across all downstream systems",
-            "If treated as Edit: risk of overwriting a different person's contact info",
-            "SOP does not cover ambiguous identity matches — cannot proceed without clarification"
-        ],
-        artifacts: [
-            {
-                id: "art-conflict", type: "json", label: "Identity Conflict Analysis",
-                data: {
-                    requestedContact: "Jane Smith (jane.smith@acme.com)",
-                    existingContact: "Jane Smith (jsmith@acme.com)",
-                    account: "Acme Industries (GPID 33456)",
-                    conflictType: "Same name, different email",
-                    riskIfAdd: "Duplicate records in OnBase, Benefits Admin, COBRA",
-                    riskIfEdit: "Overwrite different person's data, break SSO linkage",
-                    sopCoverage: "Gap — no procedure for ambiguous identity match"
-                }
-            },
-            {
-                id: "decision-analyst",
-                type: "decision",
-                label: "Action Required: Identity Conflict Resolution",
-                data: {
-                    question: "An existing contact 'Jane Smith (jsmith@acme.com)' was found on this account. The request is to add 'Jane Smith (jane.smith@acme.com)'. How should this conflict be resolved?",
-                    options: [
-                        {
-                            label: "Send RFI to Client — Ask the client to clarify whether this is the same person or a different individual",
-                            value: "send_rfi",
-                            signal: "WCC005_ANALYST_RFI"
-                        },
-                        {
-                            label: "Escalate to Manager — Route to manager for review and decision",
-                            value: "escalate_manager",
-                            signal: "WCC005_ANALYST_ESCALATE"
-                        }
-                    ]
-                }
-            }
-        ]
-    });
-    await updateProcessListStatus(PROCESS_ID, "Needs Attention", "Identity conflict detected - awaiting analyst decision");
-
-    // Wait for analyst to click "Escalate to Manager"
-    await waitForSignal("WCC005_ANALYST_ESCALATE");
-
-    // ==========================================
-    // STEP 4: ESCALATION ACKNOWLEDGED + HITL #2
-    // Manager gets three options: Add, Edit, or RFI
-    // ==========================================
-    updateProcessLog(PROCESS_ID, {
-        id: "step-4",
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        title: "Escalating identity conflict to manager for review...",
-        status: "processing"
-    });
-    await updateProcessListStatus(PROCESS_ID, "In Progress", "Escalating to manager...");
-    await delay(2000);
-
-    updateProcessLog(PROCESS_ID, {
-        id: "step-4",
         title: "Escalated to manager - awaiting manager decision",
         status: "warning",
         reasoning: [
-            "Analyst chose to escalate identity conflict to manager",
-            "Conflict summary forwarded:",
-            "  Requested: Jane Smith (jane.smith@acme.com) — Add",
-            "  Existing:  Jane Smith (jsmith@acme.com) — already on GPID 33456",
-            "Manager must decide: treat as Add, treat as Edit, or request client clarification"
-        ],
-        artifacts: [
-            {
-                id: "art-escalation", type: "json", label: "Escalation Summary",
-                data: {
-                    escalatedBy: "Analyst",
-                    reason: "Ambiguous identity match on contact Add request",
-                    requestedContact: "Jane Smith (jane.smith@acme.com)",
-                    existingContact: "Jane Smith (jsmith@acme.com)",
-                    account: "Acme Industries (GPID 33456)",
-                    rolesRequested: ["Primary", "Portal Access", "File Notifications"],
-                    existingRoles: ["Portal Access", "File Errors"]
-                }
-            },
-            {
-                id: "decision-manager",
-                type: "decision",
-                label: "Manager Decision: Identity Conflict",
-                data: {
-                    question: "A contact 'Jane Smith' already exists on GPID 33456 with a different email. The analyst has escalated this for your decision. How should this be resolved?",
-                    options: [
-                        {
-                            label: "Proceed as Add — These are two different people who share the same name. Create a new contact record.",
-                            value: "proceed_add",
-                            signal: "WCC005_MGR_ADD"
-                        },
-                        {
-                            label: "Proceed as Edit — This is the same person whose email has changed. Update the existing record.",
-                            value: "proceed_edit",
-                            signal: "WCC005_MGR_EDIT"
-                        },
-                        {
-                            label: "Send RFI to Client — Request clarification from the client before making any changes.",
-                            value: "send_rfi",
-                            signal: "WCC005_MGR_RFI"
-                        }
-                    ]
-                }
-            }
-        ]
-    });
-    await updateProcessListStatus(PROCESS_ID, "Needs Attention", "Manager review - identity conflict decision pending");
-
-    // Wait for manager to click "Send RFI to Client"
-    await waitForSignal("WCC005_MGR_RFI");
-
-    // ==========================================
-    // STEP 5: RFI EMAIL DRAFT (email-based HITL)
-    // ==========================================
-    updateProcessLog(PROCESS_ID, {
-        id: "step-5",
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        title: "Drafting RFI email to client for identity clarification...",
-        status: "processing"
-    });
-    await updateProcessListStatus(PROCESS_ID, "In Progress", "Drafting RFI email...");
-    await delay(2000);
-
-    updateProcessLog(PROCESS_ID, {
-        id: "step-5",
-        title: "RFI email drafted - review and send to client",
-        status: "warning",
-        reasoning: [
-            "Manager decision: Send RFI to client for clarification",
-            "Using Request for Information email template",
-            "Email asks client to confirm whether this is the same individual or a different person",
-            "Includes both email addresses for reference",
-            "No system changes will be made until client responds"
+            "Navigated to Contacts tab in OnBase Unity",
+            "Found existing contact: Jane Smith (jsmith@acme.com)",
+            "New request is for: Jane Smith (jane.smith@acme.com)",
+            "CONFLICT: Same name, different email addresses",
+            "Human operator chose: Escalate to Manager",
+            "Awaiting manager decision on resolution approach"
         ],
         artifacts: [{
-            id: "art-rfi-email", type: "email_draft", label: "RFI: Identity Clarification Request",
+            id: "art-conflict", type: "json", label: "Identity Conflict Analysis",
             data: {
-                isIncoming: false,
-                to: "hr@acme.com",
-                cc: "admin@acme.com",
-                subject: "Request for Information: Contact Identity Clarification - GPID 33456",
-                body: "Dear Acme Industries HR Team,\n\nWe received a Client Contact Change Form requesting to add a new contact to your WEX Health account (GPID 33456):\n\n  Name: Jane Smith\n  Email: jane.smith@acme.com\n  Roles: Primary, Portal Access, File Notifications\n\nHowever, we already have a contact on file with the same name but a different email address:\n\n  Existing Contact: Jane Smith\n  Existing Email: jsmith@acme.com\n  Current Roles: Portal Access, File Errors\n\nTo proceed accurately, we need your confirmation on one of the following:\n\n1. Same person — Jane Smith's email has changed from jsmith@acme.com to jane.smith@acme.com, and her roles should be updated. (We will process this as an edit to the existing record.)\n\n2. Different person — This is a different individual who happens to share the same name. (We will create a new, separate contact record.)\n\nPlease respond at your earliest convenience so we can complete this request.\n\nThank you,\nWEX Health Contact Change Team"
+                newRequest: { name: "Jane Smith", email: "jane.smith@acme.com", rolesRequested: ["Primary", "Portal Access"] },
+                existingRecord: { name: "Jane Smith", email: "jsmith@acme.com", currentRoles: ["Portal Access", "File Notifications"] },
+                conflictType: "Same name, different email",
+                riskLevel: "HIGH",
+                escalationStatus: "Escalated to Manager",
+                possibleResolutions: ["Add as new contact", "Edit existing contact", "Send RFI to client"]
             }
         }]
     });
-    await updateProcessListStatus(PROCESS_ID, "Needs Attention", "Draft Review: RFI email pending");
+    await updateProcessListStatus(PROCESS_ID, "Needs Attention", "Escalated to manager - awaiting decision");
 
-    // Wait for human to send the RFI email
-    const waitForEmail = async () => {
-        console.log("Waiting for user to send email...");
-        const API_URL = process.env.VITE_API_URL || 'http://localhost:3001';
-        try {
-            await fetch(`${API_URL}/email-status`, {
-                method: 'POST', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ sent: false })
-            });
-        } catch (e) { console.error("Failed to reset email status", e); }
-        while (true) {
-            try {
-                const response = await fetch(`${API_URL}/email-status`);
-                if (response.ok) {
-                    const { sent } = await response.json();
-                    if (sent) { console.log("Email Sent!"); return true; }
-                }
-            } catch (e) { }
-            await delay(2000);
-        }
-    };
+    // --- HITL 2: Manager Decision (RFI) ---
+    console.log("HITL 2: Waiting for MANAGER_DECISION_RFI signal...");
+    await waitForSignal("MANAGER_DECISION_RFI");
+    console.log("HITL 2 resolved: Manager chose RFI.");
 
+    await updateProcessListStatus(PROCESS_ID, "In Progress", "Manager decision: Send RFI to client");
+
+    // Step 4: Draft RFI email
+    updateProcessLog(PROCESS_ID, {
+        id: "step-4",
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        title: "Drafting RFI email to clarify identity conflict...",
+        status: "processing"
+    });
+    await updateProcessListStatus(PROCESS_ID, "In Progress", "Drafting RFI email to clarify identity conflict...");
+    await delay(2000);
+
+    updateProcessLog(PROCESS_ID, {
+        id: "step-4",
+        title: "RFI email drafted - review and send to Acme Corp HR",
+        status: "warning",
+        reasoning: [
+            "Manager approved: Send RFI to client for identity clarification",
+            "Using 'Request for Information' email template",
+            "Addressed to Acme Corp HR team",
+            "Requesting confirmation whether Jane Smith (jane.smith@acme.com) is:",
+            "  - The same person as existing Jane Smith (jsmith@acme.com)",
+            "  - A different individual who happens to share the name",
+            "If same person: existing record will be updated with new email",
+            "If different person: new contact will be added",
+            "Email requires human review before sending"
+        ],
+        artifacts: [{
+            id: "art-rfi-email", type: "email_draft", label: "RFI: Identity Clarification",
+            data: {
+                isIncoming: false,
+                to: "hr@acme.com",
+                cc: "benefits@acme.com",
+                subject: "Request for Information: Contact Identity Clarification - GPID 33210",
+                body: "Dear Acme Corp HR Team,\n\nWe are processing a contact change request to add Jane Smith (jane.smith@acme.com) to your WEX Health account (GPID 33210).\n\nHowever, we have an existing contact on file with the same name but a different email address:\n\n- Existing record: Jane Smith (jsmith@acme.com)\n- New request: Jane Smith (jane.smith@acme.com)\n\nTo proceed accurately, please confirm one of the following:\n\n1. This is the SAME person and the email address should be updated from jsmith@acme.com to jane.smith@acme.com\n2. This is a DIFFERENT individual and a new contact record should be created\n\nPlease also confirm the roles to be assigned:\n- Primary Contact\n- Portal Access\n\nThank you for your prompt response.\n\nBest regards,\nWEX Health Contact Change Team"
+            }
+        }]
+    });
+    await updateProcessListStatus(PROCESS_ID, "Needs Attention", "Draft Review: RFI email pending review");
+
+    // --- HITL 3: Email send (waitForEmail) ---
     await waitForEmail();
 
     updateProcessLog(PROCESS_ID, {
-        id: "step-5",
-        title: "RFI email sent to client - awaiting response",
+        id: "step-4",
+        title: "RFI email sent to Acme Corp - awaiting client response",
         status: "success",
         reasoning: [
-            "Manager decision: Send RFI to client for clarification",
-            "Using Request for Information email template",
-            "Email asks client to confirm whether this is the same individual or a different person",
-            "Includes both email addresses for reference",
-            "No system changes will be made until client responds"
+            "Manager approved: Send RFI to client for identity clarification",
+            "RFI email sent to hr@acme.com",
+            "CC: benefits@acme.com",
+            "Awaiting client confirmation on identity resolution",
+            "Case will resume when client responds"
         ],
         artifacts: [{
-            id: "art-rfi-email", type: "email_draft", label: "RFI: Identity Clarification Request",
+            id: "art-rfi-email", type: "email_draft", label: "RFI: Identity Clarification (Sent)",
             data: {
                 isIncoming: false,
-                isSent: true,
                 to: "hr@acme.com",
-                cc: "admin@acme.com",
-                subject: "Request for Information: Contact Identity Clarification - GPID 33456",
-                body: "Dear Acme Industries HR Team,\n\nWe received a Client Contact Change Form requesting to add a new contact to your WEX Health account (GPID 33456):\n\n  Name: Jane Smith\n  Email: jane.smith@acme.com\n  Roles: Primary, Portal Access, File Notifications\n\nHowever, we already have a contact on file with the same name but a different email address:\n\n  Existing Contact: Jane Smith\n  Existing Email: jsmith@acme.com\n  Current Roles: Portal Access, File Errors\n\nTo proceed accurately, we need your confirmation on one of the following:\n\n1. Same person — Jane Smith's email has changed from jsmith@acme.com to jane.smith@acme.com, and her roles should be updated. (We will process this as an edit to the existing record.)\n\n2. Different person — This is a different individual who happens to share the same name. (We will create a new, separate contact record.)\n\nPlease respond at your earliest convenience so we can complete this request.\n\nThank you,\nWEX Health Contact Change Team"
+                cc: "benefits@acme.com",
+                subject: "Request for Information: Contact Identity Clarification - GPID 33210",
+                body: "Dear Acme Corp HR Team,\n\nWe are processing a contact change request to add Jane Smith (jane.smith@acme.com) to your WEX Health account (GPID 33210).\n\nHowever, we have an existing contact on file with the same name but a different email address:\n\n- Existing record: Jane Smith (jsmith@acme.com)\n- New request: Jane Smith (jane.smith@acme.com)\n\nTo proceed accurately, please confirm one of the following:\n\n1. This is the SAME person and the email address should be updated from jsmith@acme.com to jane.smith@acme.com\n2. This is a DIFFERENT individual and a new contact record should be created\n\nPlease also confirm the roles to be assigned:\n- Primary Contact\n- Portal Access\n\nThank you for your prompt response.\n\nBest regards,\nWEX Health Contact Change Team"
             }
         }]
     });
     await updateProcessListStatus(PROCESS_ID, "In Progress", "RFI email sent - awaiting client response");
     await delay(1500);
 
-    // ==========================================
-    // STEP 6: CASE PAUSED + LEARNING NOTE
-    // ==========================================
+    // Step 5: Document case status
     updateProcessLog(PROCESS_ID, {
-        id: "step-6",
+        id: "step-5",
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        title: "Documenting case status, escalation path, and process recommendation...",
+        title: "Documenting case status and escalation trail...",
         status: "processing"
     });
-    await updateProcessListStatus(PROCESS_ID, "In Progress", "Documenting case status...");
+    await updateProcessListStatus(PROCESS_ID, "In Progress", "Documenting case status and escalation trail...");
     await delay(2000);
 
     updateProcessLog(PROCESS_ID, {
-        id: "step-6",
-        title: "Case paused pending client RFI response — process improvement noted",
+        id: "step-5",
+        title: "Case paused - pending RFI response for identity resolution",
         status: "completed",
         reasoning: [
-            "Identity conflict flagged: Jane Smith exists with different email on same account",
-            "Escalation path: Analyst → Manager → RFI to Client",
-            "RFI email sent to hr@acme.com requesting identity clarification",
-            "No system changes made — all updates blocked until client confirms",
-            "",
-            "📋 Process Improvement Recommendation:",
-            "In this case, the analyst escalated to a manager, who then chose to send an RFI.",
-            "The escalation added a round-trip delay without changing the outcome.",
-            "RECOMMENDATION: For future identity conflict cases, default to sending an RFI",
-            "to the client directly. This resolves the ambiguity faster and avoids the",
-            "unnecessary escalation step. Reserve manager escalation for cases where the",
-            "analyst has additional context that makes Add or Edit the clear choice.",
-            "",
+            "Identity conflict identified: two Jane Smith records",
+            "Existing: jsmith@acme.com (Portal Access, File Notifications)",
+            "Requested: jane.smith@acme.com (Primary, Portal Access)",
+            "Escalation path: Operator -> Manager -> RFI to client",
+            "RFI email sent to hr@acme.com",
             "Next steps upon client response:",
-            "  If same person → Reclassify as Edit, follow CC_EDIT flow",
-            "  If different person → Proceed with Add, note name collision in case discussion"
+            "1. If same person: Update email, merge roles",
+            "2. If different person: Add new contact, assign requested roles",
+            "Discussion added to case with full escalation trail"
         ],
         artifacts: [{
-            id: "art-status", type: "json", label: "Case Status & Recommendation",
+            id: "art-status", type: "json", label: "Case Status",
             data: {
                 caseId: "WCC_005",
                 status: "Needs Review",
-                blockedBy: "Client RFI response — identity clarification",
-                rfiSentTo: "hr@acme.com",
-                rfiSentDate: new Date().toISOString().split('T')[0],
-                escalationPath: "Analyst → Manager → RFI",
-                processRecommendation: "Default to RFI for identity conflicts; skip manager escalation",
+                conflictType: "Identity - same name, different email",
+                escalationPath: ["Operator detected conflict", "Escalated to Manager", "Manager approved RFI", "RFI sent to client"],
+                blockedBy: "Client response to RFI",
+                rfiSent: new Date().toISOString().split('T')[0],
+                existingContact: { name: "Jane Smith", email: "jsmith@acme.com" },
+                requestedContact: { name: "Jane Smith", email: "jane.smith@acme.com" },
                 pendingActions: [
-                    "Await client response to RFI",
-                    "If same person: process as Edit (update email + roles)",
-                    "If different person: process as Add (create new record)"
+                    "Await client identity confirmation",
+                    "Update or Add based on response",
+                    "Assign roles (Primary, Portal Access)"
                 ]
             }
         }]
     });
-    await updateProcessListStatus(PROCESS_ID, "Needs Review", "Pending client RFI response — identity clarification");
+    await updateProcessListStatus(PROCESS_ID, "Needs Review", "Case paused - pending RFI response for identity resolution");
 
     console.log(`${PROCESS_ID} Complete: ${CASE_NAME}`);
 })();

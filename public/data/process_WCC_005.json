@@ -1,5 +1,14 @@
 {
     "logs": [],
-    "keyDetails": {},
+    "keyDetails": {
+        "Contact Name": "Jane Smith",
+        "GPID": "33210",
+        "Contact Type": "Client",
+        "Action": "Add",
+        "Request Source": "Client Contact Change Form",
+        "Requested Email": "jane.smith@acme.com",
+        "Conflict": "Existing jsmith@acme.com found",
+        "Risk": "Identity conflict - duplicate name"
+    },
     "sidebarArtifacts": []
 }
