@@ -218,18 +218,79 @@ const waitForEmail = async () => {
 
     updateProcessLog(PROCESS_ID, {
         id: emailStep.id,
-        title: "Umbrella access email sent - client confirmed divisional access",
+        title: "Umbrella access recommendation sent to client",
         status: "success",
         reasoning: emailStep.reasoning || [],
         artifacts: emailStep.artifacts || []
     });
-    await updateProcessListStatus(PROCESS_ID, "In Progress", "Email sent - proceeding with divisional COBRA setup");
+    await updateProcessListStatus(PROCESS_ID, "In Progress", "Umbrella access recommendation sent - awaiting client response");
     await delay(1500);
 
-    // Post-email steps: Divisional COBRA setup
+    // Post-email steps: Client response then Divisional COBRA setup
+    
+    // Step 5: Awaiting client response (auto-resolve)
+    updateProcessLog(PROCESS_ID, {
+        id: "step-5",
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        title: "Awaiting client response on access preference...",
+        status: "processing"
+    });
+    await updateProcessListStatus(PROCESS_ID, "In Progress", "Awaiting client response on access preference...");
+    await delay(4000);
+
+    updateProcessLog(PROCESS_ID, {
+        id: "step-5",
+        title: "Client reply received - divisional access confirmed",
+        status: "success",
+        reasoning: [
+            "Received reply from david.park@megacorp.com",
+            "Client acknowledges umbrella access recommendation",
+            "Client confirms divisional access is required for compliance reasons",
+            "Divisions confirmed: Northeast, Southeast, Central",
+            "Proceeding with divisional COBRA setup"
+        ],
+        artifacts: [{
+            id: "art-client-reply", type: "email_draft", label: "Client Response - Divisional Access Confirmed",
+            data: {
+                isIncoming: true,
+                from: "david.park@megacorp.com",
+                to: "contactchanges@wexhealth.com",
+                subject: "Re: WEX Health COBRA Access Options - GPID 45678",
+                body: "Hi,\n\nThank you for the recommendation regarding umbrella access. We appreciate the explanation of the benefits.\n\nHowever, due to our internal compliance requirements, we need to maintain separate divisional access for our COBRA administration. Each division (Northeast, Southeast, and Central) has its own benefits coordinator who should only have visibility into their respective division.\n\nPlease proceed with the divisional access setup as originally requested for all three divisions.\n\nThank you,\nDavid Park\nBenefits Manager\nMegaCorp Industries"
+            }
+        }]
+    });
+    await updateProcessListStatus(PROCESS_ID, "In Progress", "Client confirmed divisional access - proceeding with COBRA setup");
+    await delay(1500);
+
+    // Step 6: Processing confirmation
+    updateProcessLog(PROCESS_ID, {
+        id: "step-6",
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        title: "Processing client confirmation...",
+        status: "processing"
+    });
+    await updateProcessListStatus(PROCESS_ID, "In Progress", "Processing client confirmation...");
+    await delay(2000);
+
+    updateProcessLog(PROCESS_ID, {
+        id: "step-6",
+        title: "Client confirmed divisional access - proceeding with COBRA setup",
+        status: "success",
+        reasoning: [
+            "Client responded to umbrella access recommendation",
+            "Client confirmed divisional access is required",
+            "Divisions confirmed: Northeast, Southeast, Central",
+            "Proceeding with divisional COBRA setup"
+        ],
+        artifacts: []
+    });
+    await updateProcessListStatus(PROCESS_ID, "In Progress", "Divisional access confirmed - setting up COBRA divisions");
+    await delay(1500);
+
     const postSteps = [
         {
-            id: "step-5",
+            id: "step-7",
             title_p: "Setting up divisional access in COBRA Admin Portal...",
             title_s: "Division Northeast configured - registration code generated",
             reasoning: [
@@ -255,7 +316,7 @@ const waitForEmail = async () => {
             }]
         },
         {
-            id: "step-6",
+            id: "step-8",
             title_p: "Configuring Southeast division access...",
             title_s: "Division Southeast configured - registration code generated",
             reasoning: [
@@ -276,7 +337,7 @@ const waitForEmail = async () => {
             }]
         },
         {
-            id: "step-7",
+            id: "step-9",
             title_p: "Configuring Central division access...",
             title_s: "Division Central - 'Create Login' unavailable, sub-case submitted",
             reasoning: [
@@ -301,7 +362,7 @@ const waitForEmail = async () => {
             }]
         },
         {
-            id: "step-8",
+            id: "step-10",
             title_p: "Sending divisional web access instructions to contact...",
             title_s: "Registration email sent with all division codes",
             reasoning: [
@@ -328,7 +389,7 @@ const waitForEmail = async () => {
             }]
         },
         {
-            id: "step-9",
+            id: "step-11",
             title_p: "Confirming setup and documenting case...",
             title_s: "Divisional COBRA setup complete - 2/3 divisions active, 1 pending",
             reasoning: [
