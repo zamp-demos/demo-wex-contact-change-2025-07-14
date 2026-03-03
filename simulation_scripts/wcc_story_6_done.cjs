@@ -135,7 +135,13 @@ const updateProcessListStatus = async (processId, status, currentStatus) => {
                 "Not an Aptia client - no Billing role check needed",
                 "Clicked 'Save and Close'"
             ],
-            artifacts: [{
+            artifacts: [
+            {
+                id: "art-onbase-create", type: "video",
+                label: "Browser Agent - OnBase Unity Contact Creation",
+                videoPath: "/data/wcc_006_step3_onbase_contact.webm"
+            },
+            {
                 id: "art-ob", type: "json", label: "OnBase Unity Record",
                 data: {
                     system: "OnBase Unity",
