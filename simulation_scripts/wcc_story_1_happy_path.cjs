@@ -142,7 +142,12 @@ const updateProcessListStatus = async (processId, status, currentStatus) => {
                 "Title field set to 'Primary' (has Primary role)",
                 "Clicked 'Add' then 'Submit'",
                 "Proceeded to portal access setup"
-            ]
+            ],
+            artifacts: [{
+                id: "art-benefits-review", type: "video",
+                label: "Browser Agent - Benefits Admin Portal",
+                videoPath: "/data/wcc_001_step4_benefits.webm"
+            }]
         },
         {
             id: "step-5",
