@@ -83,10 +83,10 @@ const waitForEmail = async () => {
     const steps = [
         {
             id: "step-1",
-            title_p: "Reviewing LEAP Contact Change request...",
-            title_s: "LEAP request validated - divisional COBRA access requested",
+            title_p: "Reviewing contact change request in OnBase Unity...",
+            title_s: "Request validated - divisional COBRA access requested via LEAP queue",
             reasoning: [
-                "Request from LEAP Client Change queue",
+                "Request picked up from LEAP Contact Change queue in OnBase Unity",
                 "Contact: David Park (david.park@megacorp.com)",
                 "Client: MegaCorp Industries (GPID 45678)",
                 "Request: Add contact with divisional COBRA access",
