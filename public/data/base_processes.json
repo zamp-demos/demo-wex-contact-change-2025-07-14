@@ -63,5 +63,17 @@
         "contactType": "Client",
         "actionType": "Add",
         "requestSource": "Client Contact Change Form"
+    },
+    {
+        "id": "WCC_006",
+        "name": "Mark Reynolds - Deactivated Contact Rediscovery",
+        "category": "Contact Change Processing",
+        "stockId": "GPID-44789",
+        "year": "2025-03-03",
+        "status": "In Progress",
+        "currentStatus": "Initializing...",
+        "contactType": "Client",
+        "actionType": "Add",
+        "requestSource": "Client Contact Change Form"
     }
 ]
