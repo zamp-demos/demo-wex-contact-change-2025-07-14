@@ -92,7 +92,14 @@ const updateProcessListStatus = async (processId, status, currentStatus) => {
                 "Roles requested: Primary, Portal Access",
                 "All required fields populated - proceeding"
             ],
-            artifacts: [{
+            artifacts: [
+        {
+          id: "art-onbase-review",
+          type: "video",
+          label: "Browser Agent - OnBase Unity Review",
+          videoPath: "/data/wcc_006_step1_onbase.webm"
+        },
+        {
                 id: "art-form", type: "file", label: "Client Contact Change Form"
             }]
         },
