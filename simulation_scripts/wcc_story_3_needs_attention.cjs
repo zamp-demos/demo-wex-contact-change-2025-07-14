@@ -127,7 +127,14 @@ const waitForSignal = async (signalId) => {
                 "MUST email client for replacement contact before proceeding",
                 "Using HIPAA Contact Verification template"
             ],
-            artifacts: [{
+            artifacts: [
+        {
+          id: "art-onbase-review",
+          type: "video",
+          label: "Browser Agent - OnBase Unity Review",
+          videoPath: "/data/wcc_003_step1_onbase.webm"
+        },
+        {
                 id: "art-gap", type: "json", label: "Role Gap Analysis",
                 data: {
                     contactToRemove: "Sarah Chen",
