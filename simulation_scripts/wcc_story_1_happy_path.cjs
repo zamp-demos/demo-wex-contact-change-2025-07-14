@@ -109,6 +109,10 @@ const updateProcessListStatus = async (processId, status, currentStatus) => {
                 "Clicked 'Save and Close'"
             ],
             artifacts: [{
+                id: "art-onbase-contact", type: "video",
+                label: "Browser Agent - OnBase Contact Creation",
+                videoPath: "/data/wcc_001_step3_onbase_contact.webm"
+            }, {
                 id: "art-ob", type: "json", label: "OnBase Unity Record",
                 data: {
                     system: "OnBase Unity",
