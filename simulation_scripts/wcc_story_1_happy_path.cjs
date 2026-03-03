@@ -180,7 +180,12 @@ const updateProcessListStatus = async (processId, status, currentStatus) => {
                 "Ensured 'Allow SSO' is checked",
                 "Single client - using real email address",
                 "Clicked 'Insert'"
-            ]
+            ],
+            artifacts: [{
+                id: "art-cobra-review", type: "video",
+                label: "Browser Agent - COBRA Admin Portal",
+                videoPath: "/data/wcc_001_step6_cobra.webm"
+            }]
         },
         {
             id: "step-7",
