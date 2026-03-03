@@ -72,7 +72,14 @@ const updateProcessListStatus = async (processId, status, currentStatus) => {
                 "EEID: APT-2847",
                 "Assigned to 3 client accounts: GPID-78901, GPID-78902, GPID-78903"
             ],
-            artifacts: [{
+            artifacts: [
+        {
+          id: "art-onbase-review",
+          type: "video",
+          label: "Browser Agent - OnBase Unity Review",
+          videoPath: "/data/wcc_002_step1_onbase.webm"
+        },
+        {
                 id: "art-form", type: "file", label: "Aptia365 Access Request Form",
                 pdfPath: "/data/wcc002_aptia_access_form.pdf"
             }]
