@@ -111,7 +111,13 @@ const waitForSignal = async (signalId) => {
                 "Action: Remove contact from all systems",
                 "Reason: Employee departure",
                 "Proceeding to pre-removal checks"
-            ]
+            ],
+            artifacts: [{
+                id: "art-onbase-review",
+                type: "video",
+                label: "Browser Agent - OnBase Unity Review",
+                videoPath: "/data/wcc_003_step1_onbase.webm"
+            }]
         },
         {
             id: "step-2",
@@ -128,12 +134,6 @@ const waitForSignal = async (signalId) => {
                 "Using HIPAA Contact Verification template"
             ],
             artifacts: [
-        {
-          id: "art-onbase-review",
-          type: "video",
-          label: "Browser Agent - OnBase Unity Review",
-          videoPath: "/data/wcc_003_step1_onbase.webm"
-        },
         {
                 id: "art-gap", type: "json", label: "Role Gap Analysis",
                 data: {
