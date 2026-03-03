@@ -228,7 +228,7 @@ const updateProcessListStatus = async (processId, status, currentStatus) => {
         reasoning: [
             "Located client account in COBRA Admin Portal",
             "Navigated to Contacts tab to add new contact",
-            "⚠ ALERT: Found existing deactivated record for this individual",
+            "ALERT: Found existing deactivated record for this individual",
             "Record shows: 'zReynolds, Mark' (z-prefix indicates prior deactivation)",
             "Active checkbox: Unchecked",
             "Email on file: mark.reynolds-GPID12345@oldclient.com (stale name-GPID workaround)",
@@ -264,7 +264,7 @@ const updateProcessListStatus = async (processId, status, currentStatus) => {
         reasoning: [
             "Located client account in COBRA Admin Portal",
             "Navigated to Contacts tab to add new contact",
-            "⚠ Found existing deactivated record: 'zReynolds, Mark'",
+            "Found existing deactivated record: 'zReynolds, Mark'",
             "Analyst decision received: Create new record alongside deactivated one",
             "Proceeding with standard add process for new contact"
         ],
