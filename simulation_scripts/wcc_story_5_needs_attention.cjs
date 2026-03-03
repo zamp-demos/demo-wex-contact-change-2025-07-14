@@ -134,7 +134,13 @@ const waitForEmail = async () => {
                 "Action: Add as new client contact",
                 "Roles requested: Primary, Portal Access",
                 "Proceeding to locate client in OnBase Unity"
-            ]
+            ],
+            artifacts: [{
+                id: "art-onbase-review",
+                type: "video",
+                label: "Browser Agent - OnBase Unity Review",
+                videoPath: "/data/wcc_005_step1_onbase.webm"
+            }]
         },
         {
             id: "step-2",
@@ -167,12 +173,6 @@ const waitForEmail = async () => {
                 "Escalation required - human decision needed"
             ],
             artifacts: [
-        {
-          id: "art-onbase-review",
-          type: "video",
-          label: "Browser Agent - OnBase Unity Review",
-          videoPath: "/data/wcc_005_step1_onbase.webm"
-        },
         {
                 id: "art-conflict", type: "json", label: "Identity Conflict Analysis",
                 data: {
