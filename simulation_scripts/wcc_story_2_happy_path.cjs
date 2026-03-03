@@ -176,6 +176,11 @@ const updateProcessListStatus = async (processId, status, currentStatus) => {
                 "Repeated for GPID 78902 (username: bobjones-78902) and GPID 78903 (username: bobjones-78903)"
             ],
             artifacts: [{
+                id: "art-benefits-review", type: "video",
+                label: "Browser Agent - Benefits Admin Portal",
+                videoPath: "/data/wcc_002_step5_benefits.webm"
+            },
+            {
                 id: "art-ben-alert", type: "json", label: "Benefits Portal - Red Alert Handled",
                 data: {
                     system: "Benefits Admin Portal",
