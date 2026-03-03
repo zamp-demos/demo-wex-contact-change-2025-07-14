@@ -134,6 +134,12 @@ const waitForSignal = async (signalId) => {
                 "Using HIPAA Contact Verification template"
             ],
             artifacts: [
+                {
+                    id: "art-onbase-rolegap",
+                    type: "video",
+                    label: "Browser Agent - OnBase Role Gap Analysis",
+                    videoPath: "/data/wcc_003_step2_onbase_rolegap.webm"
+                },
         {
                 id: "art-gap", type: "json", label: "Role Gap Analysis",
                 data: {
