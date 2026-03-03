@@ -145,7 +145,11 @@ const waitForEmail = async () => {
                 "Clicked 'Add'",
                 "Reports and notifications configured for applicable divisions"
             ],
-            artifacts: []
+            artifacts: [{
+                id: "art-benefits-review", type: "video",
+                label: "Browser Agent - Benefits Admin Portal",
+                videoPath: "/data/wcc_004_step3_benefits.webm"
+            }]
         },
         {
             id: "step-4",
