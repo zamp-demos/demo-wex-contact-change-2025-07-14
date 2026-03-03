@@ -120,7 +120,13 @@ const updateProcessListStatus = async (processId, status, currentStatus) => {
                 "Linked consulting office: ConsultFirm Partners",
                 "Aptia role is Program level - linked Aptia consulting office",
                 "Multi-client: added to all 3 client accounts"
-            ]
+            ],
+            artifacts: [{
+                id: "art-onbase-consultant",
+                type: "video",
+                label: "Browser Agent - OnBase Unity Consultant Creation",
+                videoPath: "/data/wcc_002_step3_onbase_consultant.webm"
+            }]
         },
         {
             id: "step-4",
