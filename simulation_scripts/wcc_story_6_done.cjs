@@ -246,11 +246,6 @@ const updateProcessListStatus = async (processId, status, currentStatus) => {
         ],
         artifacts: [
             {
-                id: "art-cobra-review", type: "video",
-                label: "Browser Agent - COBRA Admin Portal Review",
-                videoPath: "/data/wcc_006_step6_cobra.webm"
-            },
-            {
                 id: "art-cobra-decision", type: "decision", label: "COBRA Contact Resolution",
                 data: {
                     question: "A deactivated record for Mark Reynolds was found in COBRA (z-prefix, inactive, stale email). How should this be handled?",
@@ -282,11 +277,6 @@ const updateProcessListStatus = async (processId, status, currentStatus) => {
             "Proceeding with standard add process for new contact"
         ],
         artifacts: [
-            {
-                id: "art-cobra-review", type: "video",
-                label: "Browser Agent - COBRA Admin Portal Review",
-                videoPath: "/data/wcc_006_step6_cobra.webm"
-            },
             {
                 id: "art-cobra-decision", type: "decision", label: "COBRA Contact Resolution",
                 data: {
@@ -387,6 +377,11 @@ const updateProcessListStatus = async (processId, status, currentStatus) => {
                 "Deactivated record 'zReynolds, Mark' remains unchanged in system"
             ],
             artifacts: [{
+                id: "art-cobra-review", type: "video",
+                label: "Browser Agent - COBRA Admin Portal",
+                videoPath: "/data/wcc_006_step8_cobra.webm"
+            },
+            {
                 id: "art-cobra", type: "json", label: "COBRA Contact Record",
                 data: {
                     system: "COBRA Admin Portal",
