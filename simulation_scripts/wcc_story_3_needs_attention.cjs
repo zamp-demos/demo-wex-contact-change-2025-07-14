@@ -116,6 +116,7 @@ const waitForSignal = async (signalId) => {
                 "Client account: GPID 67890 (ClientCorp Inc.)",
                 "Action: Remove contact from all systems",
                 "Reason: Employee departure",
+                "Associated Companies: None (single GPID)",
                 "Proceeding to pre-removal checks"
             ],
             artifacts: [{
@@ -251,6 +252,7 @@ const waitForSignal = async (signalId) => {
             title_p: "Noting Special Billing and sub-case requirements...",
             title_s: "Sub-case flagged for Accounting (Special Billing client)",
             reasoning: [
+                "Reviewed Fees tab on client account - Special Billing indicated",
                 "GPID 67890 is a Special Billing client",
                 "Sub-case to Accounting: Required upon removal",
                 "SFTP file feed: Not applicable",
