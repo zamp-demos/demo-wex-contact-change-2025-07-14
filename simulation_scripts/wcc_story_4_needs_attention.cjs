@@ -95,6 +95,7 @@ const waitForEmail = async () => {
                 "Request picked up from LEAP Contact Change queue in OnBase Unity",
                 "Contact: David Park (david.park@megacorp.com)",
                 "Client: MegaCorp Industries (GPID 45678)",
+                "Associated Companies: None (single GPID)",
                 "Request: Add contact with divisional COBRA access",
                 "Divisions requested: Northeast, Southeast, Central",
                 "Divisional contacts cannot have Primary role",
@@ -112,11 +113,13 @@ const waitForEmail = async () => {
             title_p: "Creating OnBase Unity record and standard system updates...",
             title_s: "OnBase Unity record created - divisional flag set",
             reasoning: [
-                "Created contact in OnBase Unity",
-                "Division name 'Northeast, Southeast, Central' in Special Info field",
+                "Navigated to Contacts tab",
+                "Clicked 'Create Object' - entered name and email",
+                "Name format: David Park (first letter capitalized only)",
+                "Division names 'Northeast, Southeast, Central' in Special Info field",
                 "Divisional contact: cannot have Primary role - verified",
-                "Added to Benefits Admin Portal with portal access",
-                "Reports and notifications configured for applicable divisions"
+                "No COBRA ACH role requested",
+                "Clicked 'Save and Close'"
             ],
             artifacts: [{
                 id: "art-onbase-divisional",
@@ -127,6 +130,25 @@ const waitForEmail = async () => {
         },
         {
             id: "step-3",
+            title_p: "Adding contact to Benefits Admin Portal...",
+            title_s: "Contact added to Benefits Admin Portal with portal access",
+            reasoning: [
+                "Located client in Benefits Admin Portal",
+                "Clicked 'Manage profile' under Employer Setup",
+                "Completed Main Contact Info fields (matching OnBase Unity exactly)",
+                "Clicked 'Add' then 'Submit'",
+                "Clicked 'Manage employer portal users' → 'Add New User'",
+                "Selected client from Employer dropdown → clicked 'Grant Access'",
+                "Single client account - using email as Username",
+                "Left 'Email Password' as No",
+                "Selected all roles except Benefits Administrator",
+                "Clicked 'Add'",
+                "Reports and notifications configured for applicable divisions"
+            ],
+            artifacts: []
+        },
+        {
+            id: "step-4",
             title_p: "Drafting umbrella access recommendation email...",
             title_s: "Umbrella access recommendation drafted - review and send to client",
             reasoning: [
@@ -151,7 +173,7 @@ const waitForEmail = async () => {
     ];
 
     // Steps 1-2: normal processing
-    for (let i = 0; i < 2; i++) {
+    for (let i = 0; i < 3; i++) {
         const step = steps[i];
         updateProcessLog(PROCESS_ID, {
             id: step.id,
@@ -173,7 +195,7 @@ const waitForEmail = async () => {
     }
 
     // Step 3: Email-based HITL
-    const emailStep = steps[2];
+    const emailStep = steps[3];
     updateProcessLog(PROCESS_ID, {
         id: emailStep.id,
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
@@ -207,7 +229,7 @@ const waitForEmail = async () => {
     // Post-email steps: Divisional COBRA setup
     const postSteps = [
         {
-            id: "step-4",
+            id: "step-5",
             title_p: "Setting up divisional access in COBRA Admin Portal...",
             title_s: "Division Northeast configured - registration code generated",
             reasoning: [
@@ -233,7 +255,7 @@ const waitForEmail = async () => {
             }]
         },
         {
-            id: "step-5",
+            id: "step-6",
             title_p: "Configuring Southeast division access...",
             title_s: "Division Southeast configured - registration code generated",
             reasoning: [
@@ -254,7 +276,7 @@ const waitForEmail = async () => {
             }]
         },
         {
-            id: "step-6",
+            id: "step-7",
             title_p: "Configuring Central division access...",
             title_s: "Division Central - 'Create Login' unavailable, sub-case submitted",
             reasoning: [
@@ -279,7 +301,7 @@ const waitForEmail = async () => {
             }]
         },
         {
-            id: "step-7",
+            id: "step-8",
             title_p: "Sending divisional web access instructions to contact...",
             title_s: "Registration email sent with all division codes",
             reasoning: [
@@ -288,7 +310,8 @@ const waitForEmail = async () => {
                 "Northeast: NE-REG-8847",
                 "Southeast: SE-REG-9923",
                 "Central: Pending (COBRA Operations sub-case)",
-                "Note: Central division code will be sent separately when available",
+                "Sending email now for Northeast and Southeast codes",
+                "Central division code will be emailed by COBRA Operations upon sub-case completion",
                 "Email includes login instructions for each division"
             ],
             artifacts: [{
@@ -305,7 +328,7 @@ const waitForEmail = async () => {
             }]
         },
         {
-            id: "step-8",
+            id: "step-9",
             title_p: "Confirming setup and documenting case...",
             title_s: "Divisional COBRA setup complete - 2/3 divisions active, 1 pending",
             reasoning: [
