@@ -118,7 +118,14 @@ const waitForEmail = async () => {
                 "Client must explicitly confirm they want divisional access",
                 "Email pending human review before sending"
             ],
-            artifacts: [{
+            artifacts: [
+        {
+          id: "art-onbase-review",
+          type: "video",
+          label: "Browser Agent - OnBase Unity Review",
+          videoPath: "/data/wcc_004_step1_onbase.webm"
+        },
+        {
                 id: "art-email", type: "email_draft", label: "Umbrella Access Recommendation",
                 data: {
                     isIncoming: false,
