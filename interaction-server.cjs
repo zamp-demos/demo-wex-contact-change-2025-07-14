@@ -92,42 +92,48 @@ const server = http.createServer(async (req, res) => {
                         category: "Contact Change Processing", stockId: "GPID-54321",
                         year: new Date().toISOString().split('T')[0], status: "In Progress",
                         currentStatus: "Initializing...", contactType: "Client",
-                        actionType: "Add", requestSource: "Client Contact Change Form"
+                        actionType: "Add", requestSource: "Client Contact Change Form",
+                        routing: "Standard Add", contactName: "Julie Martinez"
                     },
                     {
                         id: "WCC_002", name: "Bob Jones - Aptia Consultant Add (Multi-Client)",
                         category: "Contact Change Processing", stockId: "GPID-78901",
                         year: new Date().toISOString().split('T')[0], status: "In Progress",
                         currentStatus: "Initializing...", contactType: "Consultant",
-                        actionType: "Add", requestSource: "Aptia365 WEX Health Access Request Form"
+                        actionType: "Add", requestSource: "Aptia365 WEX Health Access Request Form",
+                        routing: "Multi-Client Consultant", contactName: "Bob Jones"
                     },
                     {
                         id: "WCC_003", name: "Sarah Chen - Contact Removal with Role Gap",
                         category: "Contact Change Processing", stockId: "GPID-67890",
                         year: new Date().toISOString().split('T')[0], status: "In Progress",
                         currentStatus: "Initializing...", contactType: "Client",
-                        actionType: "Remove", requestSource: "Email Request"
+                        actionType: "Remove", requestSource: "Email Request",
+                        routing: "Removal with Role Gap", contactName: "Sarah Chen"
                     },
                     {
                         id: "WCC_004", name: "David Park - Divisional COBRA Access Setup",
                         category: "Contact Change Processing", stockId: "GPID-45678",
                         year: new Date().toISOString().split('T')[0], status: "In Progress",
                         currentStatus: "Initializing...", contactType: "Client",
-                        actionType: "Add", requestSource: "LEAP Contact Change Queue"
+                        actionType: "Add", requestSource: "LEAP Contact Change Queue",
+                        routing: "Divisional COBRA", contactName: "David Park"
                     },
                     {
                         id: "WCC_005", name: "Jane Smith - Conflicting Identity on Contact Add",
                         category: "Contact Change Processing", stockId: "GPID-33210",
                         year: new Date().toISOString().split('T')[0], status: "In Progress",
                         currentStatus: "Initializing...", contactType: "Client",
-                        actionType: "Add", requestSource: "Client Contact Change Form"
+                        actionType: "Add", requestSource: "Client Contact Change Form",
+                        routing: "Identity Conflict", contactName: "Jane Smith"
                     },
                     {
                         id: "WCC_006", name: "Mark Reynolds - Deactivated Contact Rediscovery",
                         category: "Contact Change Processing", stockId: "GPID-44789",
                         year: new Date().toISOString().split('T')[0], status: "In Progress",
                         currentStatus: "Initializing...", contactType: "Client",
-                        actionType: "Add", requestSource: "Client Contact Change Form"
+                        actionType: "Add", requestSource: "Client Contact Change Form",
+                        routing: "Deactivated Record", contactName: "Mark Reynolds"
                     }
                 ];
                 fs.writeFileSync(PROCESSES_FILE, JSON.stringify(cases, null, 4));
