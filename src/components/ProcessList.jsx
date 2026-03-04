@@ -68,10 +68,10 @@ const ProcessList = ({ category = 'Data Integrity Review' }) => {
     };
 
     const columns = [
-        { label: 'Study ID', key: 'stockId' },
-        { label: 'Document Type', key: 'documentType' },
-        { label: 'Data Points', key: 'dataPoints' },
-        { label: 'Risk Level', key: 'riskLevel' }
+        { label: 'Contact Name', key: 'contactName' },
+        { label: 'GPID', key: 'stockId' },
+        { label: 'Action', key: 'actionType' },
+        { label: 'Routing', key: 'routing' }
     ];
 
     return (
